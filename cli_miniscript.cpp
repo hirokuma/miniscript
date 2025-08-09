@@ -15,25 +15,10 @@ static bool run(std::string&& line, int64_t count) {
     if (line.size() == 0) return false;
 
     miniscript::NodeRef<std::string> ret;
-    double avgcost = 0;
-    if (Compile(Expand(line), ret, avgcost)) {
-        // policy to miniscript
-        auto str = ret->ToString(COMPILER_CTX);
-        assert(str);
-        auto script = ret->ToScript(COMPILER_CTX);
-        printf("<<Spending cost>>\nscript_size=%5i\ninput_size=%17.10f\ntotal_cost=%17.10f\n\n",
-                (int)ret->ScriptSize(),
-                avgcost,
-                ret->ScriptSize() + avgcost);
-        printf("<<miniscript output>>\n%s\n\n",
-            Abbreviate(std::move(*str)).c_str());
-        printf("<<Resulting script structure>>\n%s\n",
-            Disassemble(script).c_str());
-        printf("<<Resulting script (hex)>>\n%s\n\n",
-            HexStr(script.begin(), script.end()).c_str());
-    } else if ((ret = miniscript::FromString(Expand(line), COMPILER_CTX))) {
+    if ((ret = miniscript::FromString(Expand(line), COMPILER_CTX))) {
         auto ms = ret->ToString(COMPILER_CTX);
         assert(ms);
+        auto script = ret->ToScript(COMPILER_CTX);
         printf("count=%li\n"
             "scriptlen=%i\n"
             "maxops=%i\n"
@@ -44,7 +29,7 @@ static bool run(std::string&& line, int64_t count) {
             "input=%s\n"
             "output=%s\n"
             "timelock_mix=%s\n"
-            "miniscript=%s\n",
+            "miniscript=%s\n\n",
                 (long)count,
                 (int)ret->ScriptSize(),
                 (int)ret->GetOps(),
@@ -67,8 +52,12 @@ static bool run(std::string&& line, int64_t count) {
                 ret->GetType() << "u"_mst ? "1" : "nonzero",
                 ret->GetType() << "k"_mst ? "no": "yes",
                 Abbreviate(*ms).c_str());
+        printf("<<Resulting script structure>>\n%s\n",
+            Disassemble(script).c_str());
+        printf("<<Resulting script (hex)>>\n%s\n\n",
+            HexStr(script.begin(), script.end()).c_str());
     } else {
-        printf("Failed to parse as policy or miniscript '%s'\n", line.c_str());
+        printf("Failed to parse as miniscript: '%s'\n", line.c_str());
     }
     return true;
 }

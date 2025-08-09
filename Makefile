@@ -25,8 +25,13 @@ FLAGS := -O3 -g0 -Wall -std=c++17 -Ibitcoin
 CFLAGS := $(FLAGS) -march=native
 EMFLAGS := $(FLAGS) -fno-rtti
 
-miniscript: $(HEADERS) $(SOURCES) main.cpp
-	g++ $(CFLAGS) $(SOURCES) main.cpp -o miniscript
+all: miniscript policy
+
+miniscript: $(HEADERS) $(SOURCES) cli_miniscript.cpp
+	g++ $(CFLAGS) $(SOURCES) cli_miniscript.cpp -o miniscript
+
+policy: $(HEADERS) $(SOURCES) cli_policy.cpp
+	g++ $(CFLAGS) $(SOURCES) cli_policy.cpp -o policy
 
 miniscript.js: $(HEADERS) $(SOURCES) js_bindings.cpp
 	em++ $(EMFLAGS) $(SOURCES) js_bindings.cpp -s WASM=1 -s FILESYSTEM=0 -s ENVIRONMENT=web -s DISABLE_EXCEPTION_CATCHING=0 -s EXPORTED_FUNCTIONS='["_miniscript_compile","_miniscript_analyze","_malloc","_free"]' -s EXPORTED_RUNTIME_METHODS='["cwrap","UTF8ToString"]' -o miniscript.js
@@ -38,4 +43,4 @@ wrapper.pdf: wrapper.dot
 	dot -Tpdf <wrapper.dot >wrapper.pdf
 
 clean:
-	@rm -f miniscript miniscript.js miniscript.wasm
+	@rm -f miniscript policy miniscript.js miniscript.wasm
