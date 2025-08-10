@@ -21,7 +21,7 @@ static bool run(std::string&& line, int64_t count) {
         auto str = ret->ToString(COMPILER_CTX);
         assert(str);
         auto script = ret->ToScript(COMPILER_CTX);
-        printf("<<Spending cost>>\nscript_size=%5i\ninput_size=%17.10f\ntotal_cost=%17.10f\n\n",
+        printf("<<Spending cost>>\nscript_size=%d\naverage_input_size=%f\naverage_total_cost=%f\n\n",
                 (int)ret->ScriptSize(),
                 avgcost,
                 ret->ScriptSize() + avgcost);
